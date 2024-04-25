@@ -4,13 +4,16 @@ package com.backendufbaendereco.demo.services;
 
 
 import com.backendufbaendereco.demo.DTO.UserResponse;
+import com.backendufbaendereco.demo.Exeption.ValidationException;
 import com.backendufbaendereco.demo.entities.User;
 import com.backendufbaendereco.demo.repositories.UserRepository;
 import com.backendufbaendereco.demo.util.RandomString;
 import jakarta.mail.MessagingException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.io.UnsupportedEncodingException;
 
@@ -25,10 +28,12 @@ public class UserService {
 
     @Autowired
     private MailService mailService;
+
+    @Transactional
     public UserResponse registerUser(User user) throws MessagingException, UnsupportedEncodingException {
 
         if (userRepository.findByEmail(user.getEmail()) != null) {
-            throw  new RuntimeException("This email already exists");
+            throw new ValidationException("This email already exists");
         }
 
         String passwordEncoded = passwordEncoder.encode(user.getPassword());
@@ -39,15 +44,9 @@ public class UserService {
         user.setEnabled(false);
 
         User savedUser = userRepository.save(user);
-        mailService.sendVerificationEmail(savedUser);
+       mailService.sendVerificationEmail(savedUser);
 
-
-        UserResponse userResponse = new UserResponse(
-                savedUser.getId(),
-                savedUser.getName(),
-                savedUser.getEmail()
-        );
-        return userResponse;
+        return new UserResponse(savedUser.getId(), savedUser.getName(), savedUser.getEmail());
     }
     public boolean verify(String verificationCode){
         User user = userRepository.findByVerificationCode(verificationCode);
@@ -57,6 +56,7 @@ public class UserService {
         user.setVerificationCode(null);
         user.setEnabled(true);
         userRepository.save(user);
-        return true;
+        User savedUser = userRepository.save(user);
+        return  (savedUser != null) ? true : false;
     }
 }

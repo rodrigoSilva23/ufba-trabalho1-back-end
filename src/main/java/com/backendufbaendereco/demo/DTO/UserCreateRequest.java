@@ -3,6 +3,8 @@ package com.backendufbaendereco.demo.DTO;
 
 
 import com.backendufbaendereco.demo.entities.User;
+import com.backendufbaendereco.demo.entities.UserRole;
+import com.backendufbaendereco.demo.validators.enumValidation.EnumValue;
 import jakarta.validation.constraints.*;
 
 public record UserCreateRequest(
@@ -21,6 +23,7 @@ public record UserCreateRequest(
 
         @NotNull(message = "role cannot be null")
         @NotBlank(message = "role cannot be blank")
+        @EnumValue(enumClass = UserRole.class, ignoreCase = true)
         String role
 ){
     public User toModel(){

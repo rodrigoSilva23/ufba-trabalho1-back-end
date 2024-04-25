@@ -15,13 +15,13 @@ import java.io.UnsupportedEncodingException;
 public class MailService {
     @Autowired
     private JavaMailSender emailSender;
-    private String verifyURL = "http://localhost:8080/user/verify?code=";
+    private String verifyURL = "http://localhost:8080/api/v1/user/verify?code=";
 
     public void sendVerificationEmail(User user) throws MessagingException, UnsupportedEncodingException {
 
       String toAddress = user.getEmail();
       String fromAddress = "rodriguinho2456@gmail.com";
-      String senderName = "PaymentSystem";
+      String senderName = "UfbaEndeçoAPi";
       String subject = "Please verify your registration";
 
       String content = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional //EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
