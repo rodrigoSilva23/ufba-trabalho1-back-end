@@ -44,7 +44,7 @@ public class UserService {
         user.setEnabled(false);
 
         User savedUser = userRepository.save(user);
-       mailService.sendVerificationEmail(savedUser);
+     //  mailService.sendVerificationEmail(savedUser);
 
         return new UserResponse(savedUser.getId(), savedUser.getName(), savedUser.getEmail());
     }
