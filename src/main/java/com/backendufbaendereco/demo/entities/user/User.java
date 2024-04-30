@@ -1,11 +1,16 @@
-package com.backendufbaendereco.demo.entities;
+package com.backendufbaendereco.demo.entities.user;
 
+import com.backendufbaendereco.demo.entities.andress.Address;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -41,7 +46,13 @@ public class User  implements UserDetails {
         this.role = role;
 
     }
+    public User(String name, String email, String password, boolean enabled) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.enabled = enabled;
 
+    }
     public User() {
     }
     @Override
@@ -72,4 +83,16 @@ public class User  implements UserDetails {
     public boolean isEnabled() {
         return this.enabled;
     }
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_address",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id")
+    )
+    private Set<Address> addresses = new HashSet<>();
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 }

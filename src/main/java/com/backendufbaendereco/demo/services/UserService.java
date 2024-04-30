@@ -3,9 +3,10 @@ package com.backendufbaendereco.demo.services;
 
 
 
+import com.backendufbaendereco.demo.DTO.UserFindResponse;
 import com.backendufbaendereco.demo.DTO.UserResponse;
 import com.backendufbaendereco.demo.Exeption.ValidationException;
-import com.backendufbaendereco.demo.entities.User;
+import com.backendufbaendereco.demo.entities.user.User;
 import com.backendufbaendereco.demo.repositories.UserRepository;
 import com.backendufbaendereco.demo.util.RandomString;
 import jakarta.mail.MessagingException;
@@ -13,9 +14,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -58,5 +60,17 @@ public class UserService {
         userRepository.save(user);
         User savedUser = userRepository.save(user);
         return  (savedUser != null) ? true : false;
+    }
+    public List<UserFindResponse> findAll(){
+
+        return userRepository.findAll()
+                .stream()
+                .map(UserFindResponse::fromUser)
+                .collect(Collectors.toList());
+    }
+
+    public UserFindResponse findById(Long id){
+        User response = userRepository.findById(id).orElseThrow(() -> new ValidationException("User not found"));
+        return UserFindResponse.fromUser(response);
     }
 }

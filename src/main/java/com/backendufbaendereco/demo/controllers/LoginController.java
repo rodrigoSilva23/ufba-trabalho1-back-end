@@ -4,7 +4,7 @@ package com.backendufbaendereco.demo.controllers;
 
 import com.backendufbaendereco.demo.DTO.AuthenticationRequest;
 import com.backendufbaendereco.demo.DTO.AuthenticationResponse;
-import com.backendufbaendereco.demo.entities.User;
+import com.backendufbaendereco.demo.entities.user.User;
 import com.backendufbaendereco.demo.services.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

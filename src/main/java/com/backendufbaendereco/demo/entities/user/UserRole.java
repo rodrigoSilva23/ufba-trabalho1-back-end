@@ -1,4 +1,4 @@
-package com.backendufbaendereco.demo.entities;
+package com.backendufbaendereco.demo.entities.user;
 
 public enum UserRole {
     USER("user"),

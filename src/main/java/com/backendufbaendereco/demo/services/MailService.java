@@ -1,7 +1,7 @@
 package com.backendufbaendereco.demo.services;
 
 
-import com.backendufbaendereco.demo.entities.User;
+import com.backendufbaendereco.demo.entities.user.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;

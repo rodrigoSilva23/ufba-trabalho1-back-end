@@ -2,8 +2,8 @@ package com.backendufbaendereco.demo.DTO;
 
 
 
-import com.backendufbaendereco.demo.entities.User;
-import com.backendufbaendereco.demo.entities.UserRole;
+import com.backendufbaendereco.demo.entities.user.User;
+import com.backendufbaendereco.demo.entities.user.UserRole;
 import com.backendufbaendereco.demo.validators.enumValidation.EnumValue;
 import jakarta.validation.constraints.*;
 
