@@ -3,10 +3,15 @@ package com.backendufbaendereco.demo.services;
 
 
 
+import com.backendufbaendereco.demo.DTO.AddressRequest;
 import com.backendufbaendereco.demo.DTO.UserFindResponse;
 import com.backendufbaendereco.demo.DTO.UserResponse;
 import com.backendufbaendereco.demo.Exeption.ValidationException;
+import com.backendufbaendereco.demo.entities.andress.Address;
 import com.backendufbaendereco.demo.entities.user.User;
+import com.backendufbaendereco.demo.entities.user.UserAddressMapping;
+import com.backendufbaendereco.demo.repositories.CityRepository;
+import com.backendufbaendereco.demo.repositories.UserAddressMappingRepository;
 import com.backendufbaendereco.demo.repositories.UserRepository;
 import com.backendufbaendereco.demo.util.RandomString;
 import jakarta.mail.MessagingException;
@@ -30,6 +35,13 @@ public class UserService {
 
     @Autowired
     private MailService mailService;
+    @Autowired
+    private CityRepository cityRepository;
+    @Autowired
+    private AddressService addressService;
+
+    @Autowired
+    private UserAddressMappingRepository userAddressMappingRepository;
 
     @Transactional
     public UserResponse registerUser(User user) throws MessagingException, UnsupportedEncodingException {
@@ -72,5 +84,24 @@ public class UserService {
     public UserFindResponse findById(Long id){
         User response = userRepository.findById(id).orElseThrow(() -> new ValidationException("User not found"));
         return UserFindResponse.fromUser(response);
+    }
+
+    @Transactional
+    public void createUserAddress (AddressRequest address, Long userId) {
+
+        Address addressData = addressService.createAddress(address);
+        User user = userRepository.findById(userId).orElseThrow(() -> new ValidationException("User not found"));
+
+        if(address.getIsMainAddress()){
+            userAddressMappingRepository.updateIsMainAddressByUserId(userId);
+        }
+
+        UserAddressMapping userAddressMapping = new UserAddressMapping();
+        userAddressMapping.setUserId(user);
+        userAddressMapping.setAddressId(addressData);
+        userAddressMapping.setMainAddress(address.getIsMainAddress());
+
+        userAddressMappingRepository.save(userAddressMapping);
+
     }
 }

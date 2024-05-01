@@ -2,14 +2,19 @@ package com.backendufbaendereco.demo.entities.andress;
 
 import com.backendufbaendereco.demo.entities.user.User;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+
+@Getter
+@Setter
 @Entity
-@Table(name = "andresses")
+@Table(name = "addresses")
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +31,7 @@ public class Address {
     private String block;
     private String lot;
     private String complement;
+
 
     @ManyToOne
     @JoinColumn(name = "city_id", nullable = false)
@@ -44,5 +50,5 @@ public class Address {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    // Getters and setters
+
 }

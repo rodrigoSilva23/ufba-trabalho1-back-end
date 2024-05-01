@@ -27,4 +27,6 @@ public class AddressController {
     public List<StateResponse> findAllStates(){
         return addressService.findAllStates();
     }
+
+
 }
