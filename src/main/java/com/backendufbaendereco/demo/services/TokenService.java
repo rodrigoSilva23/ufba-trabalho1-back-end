@@ -26,7 +26,7 @@ public class TokenService {
                     .withSubject(user.getEmail())
                     .withClaim("userId", user.getId())
                     .withClaim("userName", user.getName())
-                    .withClaim("role", user.getRole())
+                    .withClaim("role", String.valueOf(user.getRole()))
                     .withExpiresAt(ExpirationDate())
                     .sign(algorithm);
 
@@ -38,7 +38,7 @@ public class TokenService {
 
     private Instant ExpirationDate() {
 
-        return LocalDateTime.now().plusMinutes(5).toInstant(ZoneOffset.of("-03:00"));
+        return LocalDateTime.now().plusMinutes(30).toInstant(ZoneOffset.of("-03:00"));
     }
     public String validateToken(String token){
 

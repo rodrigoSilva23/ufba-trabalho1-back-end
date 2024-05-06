@@ -1,9 +1,8 @@
-package com.backendufbaendereco.demo.entities.andress;
+package com.backendufbaendereco.demo.entities.address;
 
 import com.backendufbaendereco.demo.entities.user.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -13,19 +12,26 @@ import java.util.Set;
 
 @Getter
 @Setter
-@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@Entity(name = "Address")
 @Table(name = "addresses")
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 8,nullable = false)
+    @Column(name = "postal_code",length = 8,nullable = false)
     private String postalCode;
     private String street;
     private String location;
+    @Column(name = "location_type")
     private String locationType;
+
     private String neighborhood;
+
+    @Column(name = "street_type")
     private int streetType;
     private String number;
     private String block;
@@ -33,15 +39,16 @@ public class Address {
     private String complement;
 
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "city_id", nullable = false)
     private City cityId;
 
 
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "state_id",nullable = false)
     private State stateId;
+
 
     @ManyToMany(mappedBy = "addresses")
     private Set<User> users = new HashSet<>();

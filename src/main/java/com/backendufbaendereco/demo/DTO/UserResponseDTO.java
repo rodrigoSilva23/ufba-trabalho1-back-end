@@ -1,8 +1,9 @@
 package com.backendufbaendereco.demo.DTO;
 
-public record UserResponse (
+public record UserResponseDTO(
     Long id,
     String name,
-    String email
+    String email,
+    String verificationCode
 ){
 }

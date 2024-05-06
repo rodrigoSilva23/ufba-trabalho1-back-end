@@ -1,6 +1,6 @@
 package com.backendufbaendereco.demo.repositories;
 
-import com.backendufbaendereco.demo.entities.andress.State;
+import com.backendufbaendereco.demo.entities.address.State;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

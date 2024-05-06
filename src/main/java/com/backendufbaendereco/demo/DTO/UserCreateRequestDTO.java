@@ -3,11 +3,11 @@ package com.backendufbaendereco.demo.DTO;
 
 
 import com.backendufbaendereco.demo.entities.user.User;
-import com.backendufbaendereco.demo.entities.user.UserRole;
+import com.backendufbaendereco.demo.enums.RoleEnum;
 import com.backendufbaendereco.demo.validators.enumValidation.EnumValue;
 import jakarta.validation.constraints.*;
 
-public record UserCreateRequest(
+public record UserCreateRequestDTO(
         @NotNull(message = "Name cannot be null")
         @NotBlank(message = "Name cannot be blank")
         @Size(max = 100, message = "Name cannot be longer than 100 characters")
@@ -22,9 +22,9 @@ public record UserCreateRequest(
         String password,
 
         @NotNull(message = "role cannot be null")
-        @NotBlank(message = "role cannot be blank")
-        @EnumValue(enumClass = UserRole.class, ignoreCase = true)
-        String role
+
+        @EnumValue(enumClass = RoleEnum.class, ignoreCase = true)
+        RoleEnum role
 ){
     public User toModel(){
         return new User(name, email, password,role);

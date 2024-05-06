@@ -1,6 +1,7 @@
 package com.backendufbaendereco.demo.Exeption;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,26 +39,26 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Map<String, String> handleValidationExceptions(ValidationException ex) {
-        Map<String, String> errors = new HashMap<>();
-        errors.put("message", ex.getMessage());
-        return errors;
+    public ResponseEntity<ErrorObject>  handleValidationExceptions(ValidationException ex) {
+        ErrorObject errorObject = new ErrorObject();
+
+        errorObject.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        errorObject.setMessage(ex.getMessage());
+        errorObject.setTimestamp(new Date());
+        return new ResponseEntity<ErrorObject>(errorObject, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AuthException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    public Map<String, String> handleValidationExceptions(AuthException ex) {
-        Map<String, String> errors = new HashMap<>();
-        errors.put("message", ex.getMessage());
-        return errors;
+    public ResponseEntity<ErrorObject> handleValidationExceptions(AuthException ex) {
+        ErrorObject errorObject = new ErrorObject();
+
+        errorObject.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+        errorObject.setMessage(ex.getMessage());
+        errorObject.setTimestamp(new Date());
+        return new ResponseEntity<ErrorObject>(errorObject, HttpStatus.UNAUTHORIZED);
     }
-    @ExceptionHandler(AuthenticationException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ResponseBody
-    public Map<String, String> handleValidationExceptions(AuthenticationException ex) {
-        Map<String, String> errors = new HashMap<>();
-        errors.put("message", ex.getMessage());
-        return errors;
-    }
+
+
 }

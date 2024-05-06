@@ -1,8 +1,7 @@
-package com.backendufbaendereco.demo.entities.andress;
+package com.backendufbaendereco.demo.entities.address;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -10,7 +9,10 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@Entity(name = "City")
 @Table(name = "cities")
 public class City {
     @Id
@@ -20,7 +22,7 @@ public class City {
     private String name;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "state_id")
     private State state;
 

@@ -2,10 +2,7 @@ package com.backendufbaendereco.demo.controllers;
 
 
 import com.auth0.jwt.interfaces.Claim;
-import com.backendufbaendereco.demo.DTO.AddressRequest;
-import com.backendufbaendereco.demo.DTO.UserCreateRequest;
-import com.backendufbaendereco.demo.DTO.UserFindResponse;
-import com.backendufbaendereco.demo.DTO.UserResponse;
+import com.backendufbaendereco.demo.DTO.*;
 import com.backendufbaendereco.demo.entities.user.User;
 import com.backendufbaendereco.demo.helper.JwtHelper;
 import com.backendufbaendereco.demo.services.UserService;
@@ -13,12 +10,11 @@ import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.annotation.rsocket.RSocketSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
@@ -35,9 +31,9 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> registerUser(@RequestBody @Valid UserCreateRequest userRequest) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody @Valid UserCreateRequestDTO userRequest) throws MessagingException, UnsupportedEncodingException {
        User user = userRequest.toModel();
-        UserResponse savedUser = userService.registerUser(user);
+        UserResponseDTO savedUser = userService.registerUser(user);
         return ResponseEntity.ok().body(savedUser);
     }
 
@@ -46,19 +42,19 @@ public class UserController {
        return userService.verify(code) ? "verify_success" : "verify_fail" ;
     }
     @GetMapping()
-    public List<UserFindResponse> findAll(){
+    public List<UserFindResponseDTO> findAll(){
         return userService.findAll();
     }
 
     @GetMapping("{id}")
-    public UserFindResponse findById(@PathVariable("id") Long id){
+    public UserFindResponseDTO findById(@PathVariable("id") Long id){
         return userService.findById(id);
     }
 
 
     @PostMapping("/{id}/address")
 
-    public ResponseEntity<?>   createUserAddress(@PathVariable("id") Long id,  @RequestBody @Valid AddressRequest address, HttpServletRequest request){
+    public ResponseEntity<?>   createUserAddress(@PathVariable("id") Long id, @RequestBody @Valid AddressRequestDTO address, HttpServletRequest request){
 
         Map<String, Claim> userData = jwtHelper.getUserDataFromJwtToken(request);
         Long userId = userData.get("userId").asLong();
@@ -68,6 +64,60 @@ public class UserController {
         }
         userService.createUserAddress(address,id);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+
+    @PutMapping("/{id}/address")
+    public ResponseEntity<?>   updateUserAddress(@PathVariable("id") Long id, @RequestBody @Valid AddressRequestDTO address, HttpServletRequest request){
+
+        Map<String, Claim> userData = jwtHelper.getUserDataFromJwtToken(request);
+        Long userId = userData.get("userId").asLong();
+
+        if (!id.equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("O ID fornecido não corresponde ao usuário logado");
+        }
+        AddressResponseDTO updatedAddress =  userService.updateUserAddress(address,id);
+        return ResponseEntity.ok().body(updatedAddress);
+    }
+
+    @DeleteMapping ("/{id}/address/{addressId}")
+    public ResponseEntity<?>   deleteUserAddress(@PathVariable("id") Long id, @PathVariable("addressId") Long addressId, HttpServletRequest request){
+
+        Map<String, Claim> userData = jwtHelper.getUserDataFromJwtToken(request);
+        Long userId = userData.get("userId").asLong();
+
+        if (!id.equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("O ID fornecido não corresponde ao usuário logado");
+        }
+        userService.deleteUserAddress(addressId,id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping ("/{id}/address")
+
+    public Page<AddressResponseDTO> findAllUserAddress(@PathVariable("id") Long id , Pageable pageable, HttpServletRequest request){
+        Map<String, Claim> userData = jwtHelper.getUserDataFromJwtToken(request);
+        Long userId = userData.get("userId").asLong();
+
+        if (!id.equals(userId)) {
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body("O ID fornecido não corresponde ao usuário logado");
+        }
+
+        Page<AddressResponseDTO> addressResponse = userService.findAllUserAddress(id,pageable);
+        return  addressResponse;
+    }
+
+    @GetMapping ("/{id}/address/{addressId}")
+    public ResponseEntity<?>  findByAddressIdUserAddress(@PathVariable("id") Long id ,@PathVariable("addressId") Long addressId, HttpServletRequest request){
+        Map<String, Claim> userData = jwtHelper.getUserDataFromJwtToken(request);
+        Long userId = userData.get("userId").asLong();
+
+        if (!id.equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("O ID fornecido não corresponde ao usuário logado");
+        }
+
+        AddressResponseDTO addressResponse = userService.findByAddressIdUserAddress(id,addressId);
+        return  ResponseEntity.status(HttpStatus.OK).body(addressResponse);
     }
 
 

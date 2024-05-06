@@ -1,9 +1,8 @@
 package com.backendufbaendereco.demo.entities.user;
 
-import com.backendufbaendereco.demo.entities.andress.Address;
+import com.backendufbaendereco.demo.entities.address.Address;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -11,7 +10,10 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@Entity(name = "UserAddressMapping")
 @Table(name = "user_address")
 public class UserAddressMapping {
     @Id
@@ -33,5 +35,6 @@ public class UserAddressMapping {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
 
 }

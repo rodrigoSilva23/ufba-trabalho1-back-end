@@ -1,9 +1,8 @@
-package com.backendufbaendereco.demo.entities.andress;
+package com.backendufbaendereco.demo.entities.address;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -12,7 +11,10 @@ import java.util.List;
 
 @Getter
 @Setter
-@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@Entity(name = "state")
 @Table(name = "states")
 public class State {
     @Id
@@ -24,7 +26,7 @@ public class State {
     private String ibgeStateCode;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "state")
+    @OneToMany(mappedBy = "state", fetch = FetchType.LAZY)
     private List<City> cities;
 
 

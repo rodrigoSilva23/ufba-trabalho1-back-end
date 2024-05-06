@@ -1,12 +1,12 @@
 package com.backendufbaendereco.demo.services;
 
-import com.backendufbaendereco.demo.DTO.AddressRequest;
-import com.backendufbaendereco.demo.DTO.CityResponse;
-import com.backendufbaendereco.demo.DTO.StateResponse;
+import com.backendufbaendereco.demo.DTO.AddressRequestDTO;
+import com.backendufbaendereco.demo.DTO.CityResponseDTO;
+import com.backendufbaendereco.demo.DTO.StateResponseDTO;
 import com.backendufbaendereco.demo.Exeption.ValidationException;
-import com.backendufbaendereco.demo.entities.andress.Address;
-import com.backendufbaendereco.demo.entities.andress.City;
-import com.backendufbaendereco.demo.entities.andress.State;
+import com.backendufbaendereco.demo.entities.address.Address;
+import com.backendufbaendereco.demo.entities.address.City;
+import com.backendufbaendereco.demo.entities.address.State;
 import com.backendufbaendereco.demo.repositories.AddressRepository;
 import com.backendufbaendereco.demo.repositories.CityRepository;
 import com.backendufbaendereco.demo.repositories.StateRepository;
@@ -28,14 +28,14 @@ public class AddressService {
 
 
 
-    public List<CityResponse> getCitiesByState(Long stateId){
+    public List<CityResponseDTO> getCitiesByState(Long stateId){
 
-        return cityRepository.findByStateId(stateId).stream() .map(CityResponse::fromCity).collect(Collectors.toList());
+        return cityRepository.findByStateId(stateId).stream() .map(CityResponseDTO::fromCity).collect(Collectors.toList());
 
     }
 
-    public List<StateResponse> findAllStates(){
-        return stateRepository.findAll().stream().map(StateResponse::fromState).collect(Collectors.toList());
+    public List<StateResponseDTO> findAllStates(){
+        return stateRepository.findAll().stream().map(StateResponseDTO::fromState).collect(Collectors.toList());
     }
 
     public State getStateIdByCityId(Long cityId) {
@@ -47,10 +47,10 @@ public class AddressService {
         return state;
     }
 
-    public Address createAddress(AddressRequest address) {
+    public Address createAddress(AddressRequestDTO address) {
 
         City city = cityRepository.findById(address.getCityId())
-                            .orElseThrow(() -> new jakarta.validation.ValidationException("City not found with id: " + address.getCityId()));
+                            .orElseThrow(() -> new ValidationException("City not found with id: " + address.getCityId()));
 
         State state = this.getStateIdByCityId(address.getCityId());
         Address addressData = address.toAddress(city, state);

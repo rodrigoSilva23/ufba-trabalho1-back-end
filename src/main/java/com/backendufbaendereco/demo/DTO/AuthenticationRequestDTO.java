@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record AuthenticationRequest(
+public record AuthenticationRequestDTO(
         @NotNull(message = "email cannot be null")
         @NotBlank(message = "email cannot be blank")
         @Email(message = "Email is not valid")
