@@ -41,6 +41,7 @@ public class UserController {
     public String verify(@Param("code") String code){
        return userService.verify(code) ? "verify_success" : "verify_fail" ;
     }
+
     @GetMapping()
     public List<UserFindResponseDTO> findAll(){
         return userService.findAll();
