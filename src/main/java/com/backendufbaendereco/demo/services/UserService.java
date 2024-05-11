@@ -1,8 +1,6 @@
 package com.backendufbaendereco.demo.services;
 
 
-
-
 import com.backendufbaendereco.demo.DTO.AddressRequestDTO;
 import com.backendufbaendereco.demo.DTO.AddressResponseDTO;
 import com.backendufbaendereco.demo.DTO.UserFindResponseDTO;
@@ -14,10 +12,11 @@ import com.backendufbaendereco.demo.entities.address.City;
 import com.backendufbaendereco.demo.entities.address.State;
 import com.backendufbaendereco.demo.entities.user.User;
 import com.backendufbaendereco.demo.entities.user.UserAddressMapping;
-import com.backendufbaendereco.demo.repositories.AddressRepository;
+import com.backendufbaendereco.demo.repositories.addressRepository.AddressRepository;
 import com.backendufbaendereco.demo.repositories.CityRepository;
-import com.backendufbaendereco.demo.repositories.UserAddressMappingRepository;
+import com.backendufbaendereco.demo.repositories.userAddressMappingRepository.UserAddressMappingRepository;
 import com.backendufbaendereco.demo.repositories.UserRepository;
+import com.backendufbaendereco.demo.repositories.userAddressMappingRepository.UserAddressMappingRepositoryImpl;
 import com.backendufbaendereco.demo.util.RandomString;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
@@ -48,10 +47,15 @@ public class UserService {
     @Autowired
     private AddressService addressService;
 
-    @Autowired
-    private UserAddressMappingRepository userAddressMappingRepository;
+
     @Autowired
     private AddressRepository addressRepository;
+
+    private UserAddressMappingRepositoryImpl userAddressMappingRepositoryImpl;
+
+    public UserService(UserAddressMappingRepositoryImpl userAddressMappingRepositoryImpl) {
+        this.userAddressMappingRepositoryImpl = userAddressMappingRepositoryImpl;
+    }
 
     @Transactional
     public UserResponseDTO registerUser(User user) throws MessagingException, UnsupportedEncodingException {
@@ -68,43 +72,47 @@ public class UserService {
         user.setEnabled(false);
 
         User savedUser = userRepository.save(user);
-     //  mailService.sendVerificationEmail(savedUser);
+        //  mailService.sendVerificationEmail(savedUser);
 
-        return new UserResponseDTO(savedUser.getId(), savedUser.getName(), savedUser.getEmail(),savedUser.getVerificationCode());
+        return new UserResponseDTO(savedUser.getId(), savedUser.getName(), savedUser.getEmail(), savedUser.getVerificationCode());
     }
-    public boolean verify(String verificationCode){
+
+    public boolean verify(String verificationCode) {
         User user = userRepository.findByVerificationCode(verificationCode);
-        if(user == null || user.isEnabled()) {
+        if (user == null || user.isEnabled()) {
             return false;
         }
         user.setVerificationCode(null);
         user.setEnabled(true);
         userRepository.save(user);
         User savedUser = userRepository.save(user);
-        return  (savedUser != null) ? true : false;
+
+
+        return (savedUser != null) ? true : false;
     }
-    public List<UserFindResponseDTO> findAll(){
+
+    public List<UserFindResponseDTO> findAll() {
 
         return userRepository.findAll()
                 .stream()
-                .map(UserFindResponseDTO::fromUser)
-                .collect(Collectors.toList());
+                .map(UserFindResponseDTO::fromUser).toList();
+
     }
 
-    public UserFindResponseDTO findById(Long id){
+    public UserFindResponseDTO findById(Long id) {
         User response = userRepository.findById(id).orElseThrow(() -> new ValidationException("User not found"));
         return UserFindResponseDTO.fromUser(response);
     }
 
     @Transactional
-    public void createUserAddress (AddressRequestDTO address, Long userId) {
+    public void createUserAddress(AddressRequestDTO address, Long userId) {
 
         Address addressData = addressService.createAddress(address);
         User user = userRepository.findById(userId).orElseThrow(() -> new ValidationException("User not found"));
 
 
-        if(address.getIsMainAddress()){
-            userAddressMappingRepository.updateIsMainAddressByUserId(userId);
+        if (address.getIsMainAddress()) {
+            userAddressMappingRepositoryImpl.updateIsMainAddressByUserId(user);
         }
 
         UserAddressMapping userAddressMapping = new UserAddressMapping();
@@ -112,12 +120,12 @@ public class UserService {
         userAddressMapping.setAddressId(addressData);
         userAddressMapping.setMainAddress(address.getIsMainAddress());
 
-        userAddressMappingRepository.save(userAddressMapping);
+        userAddressMappingRepositoryImpl.save(userAddressMapping);
 
     }
 
     @Transactional
-    public AddressResponseDTO updateUserAddress (AddressRequestDTO address, Long userId) {
+    public AddressResponseDTO updateUserAddress(AddressRequestDTO address, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ValidationException("User not found"));
 
         City city = cityRepository.findById(address.getCityId())
@@ -126,53 +134,58 @@ public class UserService {
         State state = addressService.getStateIdByCityId(address.getCityId());
         Address addressData = address.toPutAddress(city, state);
 
-        UserAddressMapping userAddressMapping = userAddressMappingRepository.findByUserIdAndByAddressId(userId,addressData.getId())
-                                            .orElseThrow(
-                                                        () -> new ValidationException("not found for user ID " + user.getId() + " and address ID " + addressData.getId()
-                                                    ));
+
+        UserAddressMapping userAddressMapping = userAddressMappingRepositoryImpl.findByUserIdAndByAddressId(user, addressData)
+                .orElseThrow(() -> new ValidationException("not found for user ID " + user.getId() + " and address ID " + address.getId()));
 
 
-        if(address.getIsMainAddress()){
-            userAddressMappingRepository.updateIsMainAddressByUserId(userId);
+        if (address.getIsMainAddress()) {
+            userAddressMappingRepositoryImpl.updateIsMainAddressByUserId(user);
         }
 
         userAddressMapping.setMainAddress(address.getIsMainAddress());
-        userAddressMappingRepository.save(userAddressMapping);
+        userAddressMappingRepositoryImpl.save(userAddressMapping);
 
         Address addressUpdated = addressRepository.save(addressData);
-        return AddressResponseDTO.addressResponse(addressUpdated,userAddressMapping.isMainAddress());
+        return AddressResponseDTO.addressResponse(addressUpdated, userAddressMapping.isMainAddress());
 
     }
+
     @Transactional
-    public void deleteUserAddress (Long addressId, Long userId) {
+    public void deleteUserAddress(Long addressId, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ValidationException("User not found"));
+        Address address = new Address();
+        address.setId(addressId);
 
 
-        UserAddressMapping userAddressMapping = userAddressMappingRepository.findByUserIdAndByAddressId(userId,addressId)
-                .orElseThrow(() -> new ValidationException("not found for user ID " + user.getId() + " and address ID " + addressId));
+        UserAddressMapping userAddressMapping = userAddressMappingRepositoryImpl.findByUserIdAndByAddressId(user, address)
+                .orElseThrow(() -> new ValidationException("not found for user ID " + user.getId() + " and address ID " + address));
 
-        userAddressMappingRepository.deleteById(userAddressMapping.getId());
+        userAddressMappingRepositoryImpl.deleteById(userAddressMapping.getId());
 
         addressRepository.deleteById(addressId);
 
     }
 
-    public Page<AddressResponseDTO> findAllUserAddress (Long userId,Pageable pageable) {
+    public Page<AddressResponseDTO> findAllUserAddress(Long userId, Pageable pageable) {
+        Page<UserAddressMapping> userAddressMappingPage = userAddressMappingRepositoryImpl.findAllUserAddress(pageable, userId);
 
-        Page<AddressResponseProjections> addressResponseProjectionsPage = userAddressMappingRepository.findAllUserAddress(pageable, userId);
-        List<AddressResponseDTO> addressResponseDTOs = addressResponseProjectionsPage.getContent().stream()
-                .map(AddressResponseDTO::createFromProjection)
-                .collect(Collectors.toList());
-        return new PageImpl<>(addressResponseDTOs, pageable, addressResponseProjectionsPage.getTotalElements());
+        List<AddressResponseDTO> addressResponseDTOList = userAddressMappingPage.getContent()
+                .stream()
+                .map(userAddressMapping -> AddressResponseDTO.addressResponse(
+                        userAddressMapping.getAddressId(),
+                        userAddressMapping.isMainAddress()
+                )).toList();
 
 
+        return new PageImpl<>(addressResponseDTOList, pageable, userAddressMappingPage.getTotalElements());
     }
-    public AddressResponseDTO findByAddressIdUserAddress (Long userId, Long addressId) {
 
-        AddressResponseProjections addressResponseProjections  = userAddressMappingRepository.findByAddressIdUserAddress(userId,addressId)
+    public AddressResponseDTO findByAddressIdUserAddress(Long userId, Long addressId) {
+
+        UserAddressMapping result = userAddressMappingRepositoryImpl.findByAddressIdUserAddress(userId, addressId)
                 .orElseThrow(() -> new ValidationException("not found for user ID " + userId + " and address ID " + addressId));
-        return AddressResponseDTO.createFromProjection(addressResponseProjections);
-
+        return AddressResponseDTO.addressResponse(result.getAddressId(), result.isMainAddress());
 
     }
 

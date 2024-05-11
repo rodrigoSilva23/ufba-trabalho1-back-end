@@ -40,7 +40,7 @@ public class AddressRequestDTO {
     private  Long stateId;
 
 
-    private Boolean isMainAddress;
+    private boolean isMainAddress;
 
 
     public Address toAddress( City city, State state) {
@@ -82,5 +82,10 @@ public class AddressRequestDTO {
         address.setCityId(city);
 
         return address;
+    }
+
+
+    public boolean getIsMainAddress() {
+        return this.isMainAddress;
     }
 }

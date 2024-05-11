@@ -104,8 +104,7 @@ public class UserController {
             ResponseEntity.status(HttpStatus.FORBIDDEN).body("O ID fornecido não corresponde ao usuário logado");
         }
 
-        Page<AddressResponseDTO> addressResponse = userService.findAllUserAddress(id,pageable);
-        return  addressResponse;
+        return userService.findAllUserAddress(id,pageable);
     }
 
     @GetMapping ("/{id}/address/{addressId}")

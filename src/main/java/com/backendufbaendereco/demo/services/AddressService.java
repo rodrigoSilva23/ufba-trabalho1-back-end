@@ -7,7 +7,7 @@ import com.backendufbaendereco.demo.Exeption.ValidationException;
 import com.backendufbaendereco.demo.entities.address.Address;
 import com.backendufbaendereco.demo.entities.address.City;
 import com.backendufbaendereco.demo.entities.address.State;
-import com.backendufbaendereco.demo.repositories.AddressRepository;
+import com.backendufbaendereco.demo.repositories.addressRepository.AddressRepository;
 import com.backendufbaendereco.demo.repositories.CityRepository;
 import com.backendufbaendereco.demo.repositories.StateRepository;
 import org.springframework.beans.factory.annotation.Autowired;

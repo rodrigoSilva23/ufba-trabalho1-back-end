@@ -1,4 +1,4 @@
-package com.backendufbaendereco.demo.repositories;
+package com.backendufbaendereco.demo.repositories.addressRepository;
 
 
 import com.backendufbaendereco.demo.entities.address.Address;
