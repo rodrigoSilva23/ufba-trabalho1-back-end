@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ResponseEntity<ErrorObject>  handleValidationExceptions(ValidationException ex) {
+    public ResponseEntity<ErrorObject>  validationException(ValidationException ex) {
         ErrorObject errorObject = new ErrorObject();
 
         errorObject.setStatusCode(HttpStatus.BAD_REQUEST.value());
@@ -48,17 +48,27 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ErrorObject>(errorObject, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(AuthException.class)
+    @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    public ResponseEntity<ErrorObject> handleValidationExceptions(AuthException ex) {
+    public ResponseEntity<ErrorObject> authException(AuthenticationException ex) {
         ErrorObject errorObject = new ErrorObject();
-
         errorObject.setStatusCode(HttpStatus.UNAUTHORIZED.value());
         errorObject.setMessage(ex.getMessage());
         errorObject.setTimestamp(new Date());
         return new ResponseEntity<ErrorObject>(errorObject, HttpStatus.UNAUTHORIZED);
     }
 
+        @ExceptionHandler(ConflictException.class)
+        @ResponseStatus(HttpStatus.CONFLICT)
+        @ResponseBody
+        public ResponseEntity<ErrorObject> conflictException(ConflictException ex) {
+            ErrorObject errorObject = new ErrorObject();
 
-}
+            errorObject.setStatusCode(HttpStatus.CONFLICT.value());
+            errorObject.setMessage(ex.getMessage());
+            errorObject.setTimestamp(new Date());
+            return new ResponseEntity<ErrorObject>(errorObject, HttpStatus.CONFLICT);
+        }
+    }
+

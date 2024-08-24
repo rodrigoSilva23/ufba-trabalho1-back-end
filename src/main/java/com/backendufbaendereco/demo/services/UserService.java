@@ -5,6 +5,8 @@ import com.backendufbaendereco.demo.DTO.AddressRequestDTO;
 import com.backendufbaendereco.demo.DTO.AddressResponseDTO;
 import com.backendufbaendereco.demo.DTO.UserFindResponseDTO;
 import com.backendufbaendereco.demo.DTO.UserResponseDTO;
+import com.backendufbaendereco.demo.Exeption.ConflictException;
+import com.backendufbaendereco.demo.Exeption.GlobalExceptionHandler;
 import com.backendufbaendereco.demo.Exeption.ValidationException;
 import com.backendufbaendereco.demo.Projections.AddressResponseProjections;
 import com.backendufbaendereco.demo.entities.address.Address;
@@ -61,7 +63,7 @@ public class UserService {
     public UserResponseDTO registerUser(User user) throws MessagingException, UnsupportedEncodingException {
 
         if (userRepository.findByEmail(user.getEmail()) != null) {
-            throw new ValidationException("This email already exists");
+            throw new ConflictException("This email already exists");
         }
 
         String passwordEncoded = passwordEncoder.encode(user.getPassword());
