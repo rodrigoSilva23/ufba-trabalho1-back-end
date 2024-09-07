@@ -1,7 +1,9 @@
 package com.backendufbaendereco.demo.entities.user;
 
+import com.backendufbaendereco.demo.entities.Pokemon;
+import com.backendufbaendereco.demo.entities.Token;
 import com.backendufbaendereco.demo.entities.address.Address;
-import com.backendufbaendereco.demo.enums.RoleEnum;
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
+
 import java.util.List;
 import java.util.Set;
 
@@ -33,7 +36,9 @@ public class User  implements UserDetails {
     private  String password;
     private String verificationCode;
     private boolean enabled;
-    private RoleEnum role;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     public User(Long id, String name, String email, String password, String verificationCode, boolean enabled) {
         this.id = id;
@@ -44,7 +49,7 @@ public class User  implements UserDetails {
         this.enabled = enabled;
     }
 
-    public User(String name, String email, String password, RoleEnum role) {
+    public User(String name, String email, String password, Role role) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -62,15 +67,7 @@ public class User  implements UserDetails {
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.role == RoleEnum.ADMIN) {
-            return List.of(
-                    new SimpleGrantedAuthority("ROLE_ADMIN"),
-                    new SimpleGrantedAuthority("ROLE_USER")
-            );
-        }
-        return List.of(
-                new SimpleGrantedAuthority("ROLE_USER")
-        );
+      return role.getAuthorities();
     }
 
     @Override
@@ -108,4 +105,7 @@ public class User  implements UserDetails {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Pokemon> pokemons = new HashSet<>();
 }

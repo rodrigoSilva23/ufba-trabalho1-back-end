@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,6 +58,10 @@ public class AddressService {
 
         return  addressRepository.save(addressData);
 
+    }
+
+    public Address  findById(Long addressId) {
+        return addressRepository.findById(addressId).orElseThrow(() -> new ValidationException("Address not found"));
     }
 
 }

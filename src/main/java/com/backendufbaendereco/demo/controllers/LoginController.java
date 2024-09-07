@@ -49,14 +49,26 @@ public class LoginController {
         return ResponseEntity.ok(new AuthenticationResponseDTO(token));
     }
 
-    @PostMapping("/logaut")
-    public  ResponseEntity logaut(Authentication authentication, HttpServletRequest request, HttpServletResponse response){
-        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-
-     
-        logoutHandler.logout(request, response, SecurityContextHolder.getContext().getAuthentication());
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
+    /*public void logout(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication
+    ) {
+        final String authHeader = request.getHeader("Authorization");
+        final String jwt;
+        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+            return;
+        }
+        jwt = authHeader.substring(7);
+        var storedToken = tokenRepository.findByToken(jwt)
+                .orElse(null);
+        if (storedToken != null) {
+            storedToken.setExpired(true);
+            storedToken.setRevoked(true);
+            tokenRepository.save(storedToken);
+            SecurityContextHolder.clearContext();
+        }
+    }*/
 
 
 }

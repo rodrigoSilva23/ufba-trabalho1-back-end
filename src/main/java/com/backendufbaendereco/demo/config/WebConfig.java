@@ -1,4 +1,4 @@
-package com.backendufbaendereco.demo;
+package com.backendufbaendereco.demo.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
