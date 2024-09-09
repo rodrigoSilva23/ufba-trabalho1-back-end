@@ -64,4 +64,10 @@ public class AddressService {
         return addressRepository.findById(addressId).orElseThrow(() -> new ValidationException("Address not found"));
     }
 
+    public List<Address> findAllAddress(){
+        return addressRepository.findAll();
+    }
+    public long countAddressesByUser(Long userId) {
+        return addressRepository.countAddressesByUser(userId);
+    }
 }
